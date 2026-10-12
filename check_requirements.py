@@ -39,8 +39,8 @@ def main():
     checked = 0
     missing_packages = 0
     missing_versions = 0
-    oldest = None  # (upload_time, "name==version")
-    package_exists = {}  # cache: name -> bool
+    oldest = None
+    package_exists = {}
 
     for name, version in parse(path):
         checked += 1
@@ -49,7 +49,6 @@ def main():
         if version:
             data = fetch(f"{PYPI}/{name}/{version}/json")
             if data is None:
-                # Version missing: does the package exist at all?
                 if key not in package_exists:
                     package_exists[key] = fetch(f"{PYPI}/{name}/json") is not None
                 if package_exists[key]:
@@ -61,7 +60,7 @@ def main():
             package_exists[key] = True
             urls = data.get("urls") or []
             if urls and urls[0].get("upload_time"):
-                uploaded = urls[0]["upload_time"]  # e.g. 2021-03-04T12:34:56
+                uploaded = urls[0]["upload_time"]
                 if oldest is None or uploaded < oldest[0]:
                     oldest = (uploaded, f"{name}=={version}")
         else:
